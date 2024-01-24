@@ -40,4 +40,12 @@ docker compose up
 ```
 
 You can follow along and watch the long process of installing all the dependencies and launching Arches v6. Once this is done you should be able to verify that it is running properly by using your browser to access Arches at `http://127.0.0.1:8004` (Note the non-standard port, 8004. We're using that port so we don't conflict with other processes that maybe using the more usual port 8000).
-  
+
+
+### Step 2: Load the v6 Package into the Arches v6.x Instance
+Open another terminal and load the v6 version of your Arches package into your Arches v6.x instance deployed via Docker. You'll note that the arches_data directory is mounted and usable by the `arches` Docker container. From the perspective of the `arches` Docker container, the path the v6 version of your Arches package is `/arches_data/arches_pkg_v6`.
+
+``` bash
+docker exec -it arches python3 manage.py packages -o load_package -s '/arches_data/arches_pkg_v6'
+```
+
