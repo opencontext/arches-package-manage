@@ -14,7 +14,7 @@ To deploy different versions of Arches, we'll use this: https://github.com/openc
   1. Branch `v6-local` for deplopying Arches v6.x on a local machine (no Nginx or Apache web server)
   2. Branch `local` for deplopying Arches v7.x on a local machine (no Nginx or Apache web server)
 
-In setting up Arches via Docker, be sure to make a directory called `arches_data` that is a SIBLING directory as the `arches-via-docker` directory (git repo) as so:
+In setting up Arches via Docker, be sure to make a directory called `arches_data` that is a SIBLING of the `arches-via-docker` directory (git repo) as so:
 
 ```
   /my_stuff/
@@ -26,4 +26,18 @@ In setting up Arches via Docker, be sure to make a directory called `arches_data
 The `arches_data` will be mounted into the Docker container running Arches to make it more convenient to share files between the Arches container and the host machine's file-system. Inside the `arches_data`, store your version 6 Arches package (for example: `arches_pkg_v_6`).
 
 
+### Step 1: Launch Arches v6.x
+In a terminal, CD into the `arches-via-docker` and switch to the `v6-local` branch. Then make a copy the default edit_dot_env file and save it as a file called `.env`:
+
+``` bash
+git checkout v6-local
+cp edit_dot_env .env
+```
+
+Now start up the Arches v6 instance along with dependencies for running on your localhost machine.
+``` bash
+docker compose up
+```
+
+You can follow along and watch the long process of installing all the dependencies and launching Arches v6. Once this is done you should be able to verify that it is running properly by using your browser to access Arches at `http://127.0.0.1:8004` (Note the non-standard port, 8004. We're using that port so we don't conflict with other processes that maybe using the more usual port 8000).
   
