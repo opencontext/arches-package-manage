@@ -43,9 +43,19 @@ You can follow along and watch the long process of installing all the dependenci
 
 
 ### Step 2: Load the v6 Package into the Arches v6.x Instance
-Open another terminal and load the v6 version of your Arches package into your Arches v6.x instance deployed via Docker. You'll note that the arches_data directory is mounted and usable by the `arches` Docker container. From the perspective of the `arches` Docker container, the path the v6 version of your Arches package is `/arches_data/arches_pkg_v6`.
+Open another terminal and load the v6 version of your Arches package into your Arches v6.x instance deployed via Docker. You'll note that the `arches_data` directory is mounted and usable by the `arches` Docker container. From the perspective of the `arches` Docker container, the path the v6 version of your Arches package is `/arches_data/arches_pkg_v6`.
 
 ``` bash
 docker exec -it arches python3 manage.py packages -o load_package -s '/arches_data/arches_pkg_v6'
+# Also load RDM related concepts, collections if present:
+docker exec -it arches python3 manage.py packages -o import_reference_data -s '/arches_data/arches_pkg_v6/reference_data/concepts/Arches8001.skos' -ow 'ignore' -st 'keep'
+docker exec -it arches python3 manage.py packages -o import_reference_data -s '/arches_data/arches_pkg_v6/reference_data/collections/Collections 8001.skos' -ow 'ignore' -st 'keep'
 ```
 
+### Step 3: Make an Export Dump of your Arches v6.x Database (with installed package)
+Once you've installed the version 6 package into your Arches v6.x instance, you should now make a Postgres dump of the Arches database (that includes data from your package). Assuming you're using the default database connection:
+
+``` bash
+docker exec -it arches bash -c "pg_dump -U postgres -h arches_db  -F c -b arches_v6 > '/arches_data/arches_v6.dump'"
+
+```
