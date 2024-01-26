@@ -59,3 +59,22 @@ Once you've installed the version 6 package into your Arches v6.x instance, you 
 docker exec -it arches bash -c "pg_dump -U postgres -h arches_db  -F c -b arches_v6 > '/arches_data/arches_v6.dump'"
 
 ```
+
+
+### Step 4: Stop the Arches v6.x Docker Instance and Start Arches v7.x
+At this point we should have an Arches v6 package loaded into an Arches v6 database that has been exported to a Postgres dump file. Now we can turn off the Docker containers used by Arches v6.x and then deploy Docker containers for Arches 7.x, using the following steps:
+
+``` bash
+cd arches-via-docker
+docker compose down
+
+# Once Docker has finished deactivating various containers, we can set up Arches v7.x
+# checkout the branch that is for local installation of the latest version of Arches (now v7.x)
+git checkout local
+
+# Make sure we have the .env file using the defaults for v7.x (so overwrite and replace the .env file we had for v6.x)
+cp edit_dot_env .env
+
+# Now start up the Arches v7 instance along with dependencies for running on your localhost machine.
+docker compose up
+```
