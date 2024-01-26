@@ -56,7 +56,7 @@ docker exec -it arches python3 manage.py packages -o import_reference_data -s '/
 Once you've installed the version 6 package into your Arches v6.x instance, you should now make a Postgres dump of the Arches database (that includes data from your package). Assuming you're using the default database connection:
 
 ``` bash
-docker exec -it arches bash -c "pg_dump -U postgres -h arches_db  -F c -b arches_v6 > '/arches_data/arches_v6.dump'"
+docker exec -it arches bash -c "pg_dump -U postgres -h arches_db  -F c -b arches_v6local > '/arches_data/arches_v6local.dump'"
 
 ```
 
@@ -78,3 +78,44 @@ cp edit_dot_env .env
 # Now start up the Arches v7 instance along with dependencies for running on your localhost machine.
 docker compose up
 ```
+You can follow along and watch the long process of installing all the dependencies and launching Arches v7. Once this is done you should be able to verify that it is running properly by using your browser to access Arches at `http://127.0.0.1:8004` (Note the non-standard port, 8004. We're using that port so we don't conflict with other processes that maybe using the more usual port 8000).
+
+
+### Step 5: Replace the Arches v7 Database with the Arches v6 database
+Once you have a working Arches v7.x instance running in Docker, it's time to break it (!). We will import the exported Arches v6 database (that has the package data loaded into it) and then replace our Arches version 7 database with the version 6 database containing package data.
+
+``` bash
+# First restore the v6 database (containing package data) into Postgres via your Arches v7 docker container (I know, confusing)...
+docker exec -it arches bash -c "pg_restore --create --clean -U postgres -h arches_db -d postgres '/arches_data/arches_v6local.dump'"
+
+# Now drop the existing Arches v7 database and recreate it using the Arches v6 database as the template.
+docker exec -it arches psql -U postgres -tc "DROP DATABASE arches_slocal WITH (FORCE);"
+docker exec -it arches psql -U postgres -tc "SELECT pg_terminate_backend(pid) from pg_stat_activity where datname='arches_v6local'";
+docker exec -it arches psql -U postgres -tc "CREATE DATABASE arches_slocal WITH TEMPLATE arches_v6local;"
+```
+
+
+### Step 6: Do various Arches 7 Migrations
+We're now at the point where Arches version 7 software is talking to an Arches version 6 database. We can now use the software to run various migration and update processes to transform the version 6 database into a working version 7 database, and in the process, update the version 6 package information.
+``` bash
+docker exec -it arches python3 manage.py migrate
+docker exec -it arches python3 manage.py updateproject
+docker exec -it arches python3 manage.py es reindex_database
+
+# You'll likely need to run the yarn build_development again because the frontend will likely be broken
+docker exec -it arches bash -c "yarn --cwd /arches_app/arches_slocal/arches_slocal build_development"
+
+```
+Once this is done you should be able to verify that it is running properly by using your browser to access Arches at `http://127.0.0.1:8004`. Hopefully the Arches v7 will have the package happily installed!
+
+
+### Step 7: Export your Arches v7 Package
+If everything worked (yep, good luck with that), then you should be ready to export the Arches v7 package to share with other Arches administrators:
+
+``` bash
+
+docker exec -it arches python3 manage.py packages -o create_package -d '/arches_data/arches_pkg_v7'
+
+# Update permissions so users outside of the Docker host can have full permissions to the package.
+docker exec -it arches bash -c 'chmod 777 -R /arches_data/arches_pkg_v7'
+
