@@ -5,7 +5,7 @@ This repo will mainly contain pseudo-code and narrative descriptions of how to m
 
 
 ## Migrate a Package from Arches v6.x to v7.x
-This workflow (not an *Arches workflow*, just a workflow in a more general sense of the term) uses Docker to deploy Arches v6 and v7 instances, some Python executed in a shell to manage some files and execute some bash/shell commands, and a little SQL to modify databases. While I'm sure this can get streamlined more, it's probably not that useful to fully automate this process since package migration from v6 to v7 is unlikely to be a super recurrent kind of need.
+This workflow (not an *Arches workflow*, just a workflow in a more general sense of the term) uses Docker to deploy Arches v6 and v7 instances, and execute some bash/shell commands to run Arches migrations and interact with the databases. While I'm sure this can get streamlined more, it's probably not that useful to fully automate this process since package migration from v6 to v7 is unlikely to be a super recurrent kind of need.
 
 
 ### Arches via Docker
@@ -23,7 +23,7 @@ In setting up Arches via Docker, be sure to make a directory called `arches_data
       └─ arches_pkg_v6
 ```
 
-The `arches_data` will be mounted into the Docker container running Arches to make it more convenient to share files between the Arches container and the host machine's file-system. Inside the `arches_data`, store your version 6 Arches package (for example: `arches_pkg_v_6`).
+The `arches_data` will be mounted into the Docker container running Arches to make it more convenient to share files between the Arches container and the host machine's file-system. Inside the `arches_data`, store your version 6 Arches package (for example: `arches_pkg_v_6`). Please note that the files (`*.xml`, `ontolog_config.json`) that make up a given ontology must be grouped together in a subdirectory of the package's `ontologies` directory (see: https://arches.readthedocs.io/en/stable/administering/ontologies-in-arches/#loading-an-ontology).
 
 
 ### Step 1: Launch Arches v6.x
