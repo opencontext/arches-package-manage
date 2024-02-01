@@ -116,6 +116,14 @@ If everything worked (yep, good luck with that), then you should be ready to exp
 
 docker exec -it arches python3 manage.py packages -o create_package -d '/arches_data/arches_pkg_v7'
 
+# NOTE: Check to make sure the branches and resource_models actually exported (they sometimes don't get exported with the command above).
+# If branches are missing, do this:
+docker exec -it arches python3 manage.py packages -o export_graphs -d '/arches_data/arches_pkg_v7/graphs/branches' -g 'branches'
+
+# If resource_models are missing, do this:
+docker exec -it arches python3 manage.py packages -o export_graphs -d '/arches_data/arches_pkg_v7/graphs/resource_models' -g 'resource_models'
+
+
 # Update permissions so users outside of the Docker host can have full permissions to the package.
 docker exec -it arches bash -c 'chmod 777 -R /arches_data/arches_pkg_v7'
 
