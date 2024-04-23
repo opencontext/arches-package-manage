@@ -87,7 +87,25 @@ Once you have a working Arches v7.x instance running in Docker, it's time to bre
 ``` bash
 # First restore the v6 database (containing package data) into Postgres via your Arches v7 docker container (I know, confusing)...
 docker exec -it arches bash -c "pg_restore --create --clean -U postgres -h arches_db -d postgres '/arches_data/arches_v6local.dump'"
+```
 
+Note: Sometimes the above command fails (for some reason that I don't have time to diagnose). You can get an error like:
+```
+pg_restore: while PROCESSING TOC:
+pg_restore: from TOC entry 5249; 1262 20641 DATABASE arches_v6local postgres
+pg_restore: error: could not execute query: ERROR:  database "arches_v6local" does not exist
+Command was: DROP DATABASE arches_v6local;
+pg_restore: warning: errors ignored on restore: 1
+```
+
+In this event, simply try the command again, and it seems to work:
+``` bash
+# Second attempt works...
+docker exec -it arches bash -c "pg_restore --create --clean -U postgres -h arches_db -d postgres '/arches_data/arches_v6local.dump'"
+```
+
+
+``` bash
 # Now drop the existing Arches v7 database and recreate it using the Arches v6 database as the template.
 docker exec -it arches psql -U postgres -tc "DROP DATABASE arches_slocal WITH (FORCE);"
 docker exec -it arches psql -U postgres -tc "SELECT pg_terminate_backend(pid) from pg_stat_activity where datname='arches_v6local'";
