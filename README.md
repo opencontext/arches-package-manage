@@ -36,6 +36,10 @@ cp edit_dot_env .env
 
 Now start up the Arches v6 instance along with dependencies for running on your localhost machine.
 ``` bash
+
+# Delete any old Arches v6 images that may exist. This may give an error if you don't have an Arches image existing.
+docker image rm arches
+
 docker compose up
 ```
 
@@ -74,6 +78,9 @@ git checkout local
 
 # Make sure we have the .env file using the defaults for v7.x (so overwrite and replace the .env file we had for v6.x)
 cp edit_dot_env .env
+
+# Delete the old Arches v6 image. We'll need to rebuild it with an Arches v7 image
+docker image rm arches
 
 # Now start up the Arches v7 instance along with dependencies for running on your localhost machine.
 docker compose up
