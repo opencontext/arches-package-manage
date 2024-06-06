@@ -148,6 +148,9 @@ docker exec -it arches python3 manage.py packages -o export_graphs -d '/arches_d
 # If resource_models are missing, do this:
 docker exec -it arches python3 manage.py packages -o export_graphs -d '/arches_data/arches_pkg_v7/graphs/resource_models' -g 'resource_models'
 
+# If you have business data you'd like to include in the new version 7 package:
+docker exec -it arches python manage.py packages -o export_business_data -d '/arches_data/arches_pkg_v7/business_data' -f 'json'
+
 
 # Update permissions so users outside of the Docker host can have full permissions to the package.
 docker exec -it arches bash -c 'chmod 777 -R /arches_data/arches_pkg_v7'
